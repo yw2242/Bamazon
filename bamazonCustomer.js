@@ -40,5 +40,27 @@ function listOfProducts() {
       console.log(columns);
 
       console.log("----------------------------------------------------");
+    }).then(function(buy) {
+        inquirer
+    .prompt([
+    {
+        name: "purchase",
+        type: "input",
+        message: "What item do you like to purchase? (Enter ID number)"
+    },
+    {
+        name: "quantity",
+        type: "input",
+        message: "How many do you like to purchase? (Enter a number)",
+        validate: function(value) {
+        if (isNaN(value) === false) {
+            return true;
+        }
+        return false;
+        }
+    }
+    ])
     });
   }
+
+
