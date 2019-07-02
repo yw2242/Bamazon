@@ -40,27 +40,46 @@ function listOfProducts() {
       console.log(columns);
 
       console.log("----------------------------------------------------");
-    }).then(function(buy) {
-        inquirer
-    .prompt([
-    {
-        name: "purchase",
-        type: "input",
-        message: "What item do you like to purchase? (Enter ID number)"
-    },
-    {
-        name: "quantity",
-        type: "input",
-        message: "How many do you like to purchase? (Enter a number)",
-        validate: function(value) {
-        if (isNaN(value) === false) {
-            return true;
-        }
-        return false;
-        }
-    }
-    ])
+      purchase();
     });
+
   }
 
 
+  function purchase(){
+	inquirer.prompt([
+	{
+		name: "item",
+		type: "input",
+		message:"Which item (ID) do you want to purchase?",
+		filter:Number
+	},
+	{
+		name:"quantity",
+		type:"input",
+		message:"How many do you want to purchase?",
+		filter:Number
+	},
+
+ ]).then(function(answers){
+ 	var quantityNeeded = answers.quantity;
+ 	var IDrequested = answers.item;
+ 	purchaseOrder(IDrequested, quantityNeeded);
+ });
+};
+
+function purchaseOrder(ID, amtNeeded){
+	connection.query('Select * FROM products WHERE item_id = ' + ID, function(err,res){
+		if(err){console.log(err)};
+		if(amtNeeded <= res[0].stock_quantity){
+			var totalCost = res[0].price * amtNeeded;
+			console.log("Order is in stock!");
+			console.log("Your total cost for " + amtNeeded + " " +res[0].product_name + " is " + totalCost + " Thank you!");
+
+			connection.query("UPDATE products SET stock_quantity = stock_quantity - " + amtNeeded + "WHERE item_id = " + ID);
+		} else{
+			console.log("Insufficient quantity, sorry we do not have enough " + res[0].product_name + "to complete your order.");
+		};
+		displayProducts();
+	});
+};
